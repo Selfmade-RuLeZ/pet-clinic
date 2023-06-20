@@ -9,13 +9,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+      with: 
+        fetch-depth: 0
+        
     - name: Setup Java
       uses: actions/setup-java@v2
       with:
         distribution: temurin
         java-version: 11
         cache: maven
-        fetch-depth: 0
 
     - name: Build, Test and upload scan to SonarCloud
       run: mvn --batch-mode verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
