@@ -17,10 +17,29 @@ jobs:
         distribution: temurin
         java-version: 11
         cache: maven
-    #### AUFGABE 2: SONAR
-      # hier ist der Platz für die Konfiguration der Sonar Analyse
+    
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
   
-    - name: Compile, build and push
-      run: |
-        #### AUFGABE 3 COMPILE, DOCKER BUILD UND PUSH
-          # hier ist Platz für maven package und docker build
+    - name: Test
+      run: mvn --batch-mode --update-snapshots verify
+
+    - name: build java package
+      run: mvn --batch-mode --update-snapshots package
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/pet-clinic:latest
